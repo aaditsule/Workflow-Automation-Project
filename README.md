@@ -1,8 +1,8 @@
-# 📬 Report Mailer
+# Report Mailer
 
-Automate the process of reading monthly reports (.docx, .xlsx, .pdf), summarizing them using GPT, and emailing them.
+Automates the process of reading monthly reports (.docx, .xlsx, .pdf), summarizing them using GPT, and emailing them.
 
-## 🛠 Setup
+## Setup
 
 ```bash
 pip install -r requirements.txt
