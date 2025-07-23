@@ -15,15 +15,7 @@ client = OpenAI()  # openai>=1.0.0
 def summarize_text(text, logger=None):
     try:
         prompt = f"""
-Based on the information provided below (from Excel, Word, or PDF), write a formal, readable summary structured into sections such as (but not limited to):
-
-- Leadership or Personnel Updates
-- Strategic Initiatives
-- Key Operational Highlights
-- Financial or Performance Metrics (if available)
-- Business Development and Marketing Activities
-- External Collaborations or Visits
-- Next Steps or Plans
+Based on the information provided below (from Excel, Word, or PDF), write a formal, readable summary structured into sections
 
 Your output should:
 - Be written in full sentences and paragraph form (no bullet points)
@@ -31,6 +23,7 @@ Your output should:
 - Maintain a professional and concise tone
 - Avoid generic phrases like "please refer to the document" or "as seen in Sheet1"
 - Not mention the data was extracted or parsed
+- Keep the summary detailed
 
 Here is the input data:\n\n{text}
 """

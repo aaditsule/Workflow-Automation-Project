@@ -14,42 +14,28 @@ def extract_text_from_pdf(path):
 def extract_text_from_excel(path):
     try:
         xl = pd.ExcelFile(path)
-        all_text = ""
+        full_text = ""
 
         for sheet in xl.sheet_names:
-            df = xl.parse(sheet, header=None)  # no header initially
+            df = xl.parse(sheet, header=None, dtype=str)
 
-            # Drop fully empty rows
+            # Remove completely empty rows and columns
             df.dropna(how='all', inplace=True)
+            df.dropna(axis=1, how='all', inplace=True)
 
             if df.empty:
                 continue
 
-            # Attempt to identify the first non-empty header row (assumes 2D structure)
-            header_row_idx = None
-            for i, row in df.iterrows():
-                if row.notna().sum() >= 2:  # at least 2 non-NaNs to consider as header
-                    header_row_idx = i
-                    break
+            full_text += f"\n\n### Sheet: {sheet}\n\n"
 
-            if header_row_idx is not None:
-                df.columns = df.iloc[header_row_idx]
-                df = df.iloc[header_row_idx + 1:]
+            df = df.fillna("").astype(str)
 
-            # Clean up: drop mostly empty columns
-            df.dropna(axis=1, thresh=2, inplace=True)
+            # Convert every row into a markdown-style row
+            for idx, row in df.iterrows():
+                row_text = " | ".join(cell.strip() for cell in row)
+                full_text += row_text + "\n"
 
-            # Convert to text
-            preview = df.head(10).fillna("").astype(str).to_string(index=False)
-
-            all_text += f"\n\n--- Sheet: {sheet} ---\n"
-            all_text += "Columns: " + ", ".join(df.columns.astype(str)) + "\n"
-            all_text += "\nSample Data:\n" + preview
-
-        if not all_text.strip():
-            return "No meaningful data found in the Excel file."
-
-        return all_text
+        return full_text.strip() or "No readable data found in Excel file."
 
     except Exception as e:
         return f"Failed to parse Excel file: {e}"
