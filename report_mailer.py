@@ -24,6 +24,8 @@ Your output should:
 - Avoid generic phrases like "please refer to the document" or "as seen in Sheet1"
 - Not mention the data was extracted or parsed
 - Keep the summary detailed
+- Avoid using secetion headers like "Introduction" or "Conclusion"
+- Avoid using ** or ## or other markdown formatting
 
 Here is the input data:\n\n{text}
 """
