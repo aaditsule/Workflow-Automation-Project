@@ -23,7 +23,7 @@ Your output should:
 - Maintain a professional and concise tone
 - Avoid generic phrases like "please refer to the document" or "as seen in Sheet1"
 - Not mention the data was extracted or parsed
-- Keep the summary detailed
+- Keep the summary detailed, should contain all relevant information
 - Avoid using secetion headers like "Introduction" or "Conclusion"
 - Avoid using ** or ## or other markdown formatting
 
