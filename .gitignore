@@ -8,4 +8,5 @@ __pycache__/
 .DS_Store
 logs
 Test.xlsx
+Test2.xlsx
 generated_reports/

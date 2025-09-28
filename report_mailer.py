@@ -6,33 +6,51 @@ from utils.email_sender import send_email
 from utils.logger import setup_logger
 from utils.pdf_generator import generate_pdf_report
 from openai import OpenAI
+from datetime import datetime
 
 # Load environment variables and logger
 load_dotenv()
 logger = setup_logger()
 client = OpenAI()  # openai>=1.0.0
+logger.info(client.models.list())
 
 def summarize_text(text, logger=None):
     try:
         prompt = f"""
-Based on the information provided below (from Excel, Word, or PDF), write a formal, readable summary structured into sections
+Based on the information provided below, Summarize this uploaded Annual report.
+Return the output in *strict JSON-like format*:
+{{
+  "title": "<short professional title capturing the essence of the update>",
+  "subtitle": "<descriptive and engaging subtitle providing context>",
+  "summary": "<multi-paragraph narrative written in the tone of a press release or board communication, highlighting key outcomes, trends, and implications>"
+}}
 
-Your output should:
-- Be written in full sentences and paragraph form (no bullet points)
-- Be suitable for inclusion in a PDF report shared with stakeholders
-- Maintain a professional and concise tone
-- Avoid generic phrases like "please refer to the document" or "as seen in Sheet1"
-- Not mention the data was extracted or parsed
-- Keep the summary detailed, should contain all relevant information
-- Avoid using secetion headers like "Introduction" or "Conclusion"
-- Avoid using ** or ## or other markdown formatting
+Do not add explanations outside this format.
+
+Guidelines for the summary:
+- Focus on storytelling and framing—assume the reader has **not seen the data** and requires context and interpretation.
+- Give more emphasis on "Sheet 1" data than "Sheet 2" data
+- Use a professional and formal tone, suitable for business communication
+- Focus on the Management discussion and Analysis section first and then the financials
+- No need to mention about the company information, field of company, history, etc.
+- Are the sales, operating profit (USE EBITDA and Not EBIT), and PAT increasing
+- Are the Operating profit margins (EBITDA) and net profit margins increasing? Show a breakdown of how they are growing and why they are increasing
+- Do not mention aything like "Data is not provided" or "As per the data" or "limited data is provided"
+- Do not mention anything about the metrics for which data is not provided
+- Is the balance sheet of the company healthy? Are there any signs of stress?
+- Keep the financial upto 2 paragraphs only
+- Identify the red flags in the company
+
+Formatting - 
+- Easy to read language
+- Use bullet points
 
 Here is the input data:\n\n{text}
 """
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4.1-mini",
             messages=[
-                {"role": "system", "content": "You write clear and professional business reports."},
+                {"role": "system", "content": "You are equity analyst and you write clear and professional business reports and summaries."},
                 {"role": "user", "content": prompt}
             ],
             temperature=0.3
@@ -40,6 +58,7 @@ Here is the input data:\n\n{text}
 
         summary = response.choices[0].message.content.strip()
         if logger: logger.info("Summary generated successfully using GPT")
+        # print( summary)
         return summary
 
     except Exception as e:
@@ -72,7 +91,12 @@ if __name__ == "__main__":
 
         summary = summarize_text(file_text, logger)
 
-        pdf_path = generate_pdf_report(summary)
+        pdf_path = generate_pdf_report(
+            content=summary,
+            output_path="monthly_summary.pdf",
+            header_image="header.jpg"
+        )
+
         logger.info(f"PDF report generated at: {pdf_path}")
 
         logger.info("\n====== GENERATED SUMMARY ======")
